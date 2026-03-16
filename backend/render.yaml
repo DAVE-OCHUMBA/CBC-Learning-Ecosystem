@@ -1,0 +1,38 @@
+# render.yaml
+# Alternative to Railway: deploy on Render.com
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: cbc-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # $7/month — upgrade to standard for production
+    region: oregon         # Closest to Kenya with acceptable latency
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      # DATABASE_URL is auto-injected by Render Postgres (see databases section below)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cbc-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true   # Render auto-generates a secure value
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      # Set remaining vars manually in Render dashboard:
+      # API_BASE_URL, FRONTEND_URL, MPESA_*, AT_*, AWS_*
+
+databases:
+  - name: cbc-postgres
+    databaseName: cbc_learning_ecosystem
+    user: cbc_app
+    plan: starter            # Free tier: 1GB storage, 90-day expiry — use paid for pilot schools
+    region: oregon

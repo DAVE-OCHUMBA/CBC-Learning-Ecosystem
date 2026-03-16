@@ -1,0 +1,166 @@
+{
+  "name": "CBC Learning Ecosystem",
+  "short_name": "CBC Learning",
+  "description": "Digital learning platform for Kenya's Competency-Based Curriculum",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-KE",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Student Dashboard"
+    },
+    {
+      "src": "/assets/screenshots/mobile-1.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Parent Payment Screen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Student Portal",
+      "short_name": "Student",
+      "description": "Access student dashboard",
+      "url": "/student/dashboard",
+      "icons": [
+        {
+          "src": "/assets/icons/student.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Teacher Portal",
+      "short_name": "Teacher",
+      "description": "Access teacher dashboard",
+      "url": "/teacher/dashboard",
+      "icons": [
+        {
+          "src": "/assets/icons/teacher.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Parent Portal",
+      "short_name": "Parent",
+      "description": "Access parent dashboard",
+      "url": "/parent/dashboard",
+      "icons": [
+        {
+          "src": "/assets/icons/parent.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Pay Fees",
+      "short_name": "Pay",
+      "description": "Pay school fees via M-Pesa",
+      "url": "/parent/payments",
+      "icons": [
+        {
+          "src": "/assets/icons/payment.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "iarc_rating_id": "",
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "file",
+          "accept": [
+            "image/*",
+            "application/pdf",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          ]
+        }
+      ]
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+cbc",
+      "url": "/app?target=%s"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}

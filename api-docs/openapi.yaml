@@ -1,0 +1,706 @@
+openapi: 3.0.0
+info:
+  title: CBC Learning Ecosystem API
+  description: |
+    Complete REST API for Kenya's Competency-Based Curriculum learning platform.
+    
+    ## Authentication
+    Most endpoints require JWT authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    - Authentication: 5 requests per 15 minutes
+    - M-Pesa Payments: 5 requests per minute
+    - General API: 100 requests per minute
+    
+    ## Environments
+    - Production: https://api.cbclearning.co.ke
+    - Staging: https://staging-api.cbclearning.co.ke
+    - Sandbox: https://sandbox-api.cbclearning.co.ke
+    
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api@cbclearning.co.ke
+    url: https://docs.cbclearning.co.ke
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.cbclearning.co.ke/api/v1
+    description: Production server
+  - url: https://staging-api.cbclearning.co.ke/api/v1
+    description: Staging server
+  - url: http://localhost:5000/api/v1
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: M-Pesa Payments
+    description: School fee payment processing
+  - name: Students
+    description: Student management and profiles
+  - name: Schools
+    description: School information and settings
+  - name: Assignments
+    description: Assignment management
+  - name: Competencies
+    description: CBC competency tracking
+  - name: Health
+    description: System health and monitoring
+
+paths:
+  # ==========================================
+  # HEALTH & MONITORING
+  # ==========================================
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Returns system health status
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 1.0.0
+                  uptime:
+                    type: number
+                    example: 86400
+                  database:
+                    type: string
+                    example: connected
+                  redis:
+                    type: string
+                    example: connected
+
+  /metrics:
+    get:
+      tags:
+        - Health
+      summary: Prometheus metrics
+      description: Returns metrics in Prometheus format
+      responses:
+        '200':
+          description: Metrics data
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  # ==========================================
+  # AUTHENTICATION
+  # ==========================================
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: teacher@nairobi-academy.sc.ke
+                password:
+                  type: string
+                  format: password
+                  example: SecurePassword123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Logged out successfully
+
+  # ==========================================
+  # M-PESA PAYMENTS
+  # ==========================================
+  /payments/mpesa/initiate:
+    post:
+      tags:
+        - M-Pesa Payments
+      summary: Initiate M-Pesa STK Push payment
+      description: Sends payment prompt to parent's phone
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - studentId
+                - amount
+                - phoneNumber
+              properties:
+                studentId:
+                  type: integer
+                  example: 12345
+                amount:
+                  type: number
+                  minimum: 10
+                  maximum: 250000
+                  example: 15000
+                  description: Amount in KES (Ksh 10 - 250,000)
+                phoneNumber:
+                  type: string
+                  pattern: '^254\d{9}$'
+                  example: "254712345678"
+                  description: Phone number in format 254XXXXXXXXX
+                description:
+                  type: string
+                  example: School fees for Term 1
+      responses:
+        '200':
+          description: Payment initiated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Payment request sent
+                  data:
+                    type: object
+                    properties:
+                      checkoutRequestId:
+                        type: string
+                        example: ws_CO_DMZ_123456789_01012024000000
+                      merchantRequestId:
+                        type: string
+                        example: 29115-34620561-1
+                      customerMessage:
+                        type: string
+                        example: Success. Request accepted for processing
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /payments/mpesa/callback:
+    post:
+      tags:
+        - M-Pesa Payments
+      summary: M-Pesa callback webhook
+      description: Receives payment status from Safaricom (public endpoint)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Callback received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ResultCode:
+                    type: integer
+                    example: 0
+                  ResultDesc:
+                    type: string
+                    example: Success
+
+  /payments/mpesa/status/{checkoutRequestId}:
+    get:
+      tags:
+        - M-Pesa Payments
+      summary: Query payment status
+      description: Check status of an M-Pesa payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: checkoutRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: ws_CO_DMZ_123456789_01012024000000
+      responses:
+        '200':
+          description: Payment status retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: [pending, successful, failed, timeout]
+                        example: successful
+                      amount:
+                        type: number
+                        example: 15000
+                      receiptNumber:
+                        type: string
+                        example: ABC12345XY
+                      transactionDate:
+                        type: string
+                        format: date-time
+                      phoneNumber:
+                        type: string
+                        example: "254712345678"
+                      resultDesc:
+                        type: string
+                        example: The service request is processed successfully
+
+  /payments/mpesa/student/{studentId}/history:
+    get:
+      tags:
+        - M-Pesa Payments
+      summary: Get payment history for student
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Payment history retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      payments:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Payment'
+                      total:
+                        type: integer
+                        example: 25
+                      summary:
+                        type: object
+                        properties:
+                          totalPaid:
+                            type: number
+                            example: 45000
+                          outstandingBalance:
+                            type: number
+                            example: 15000
+
+  # ==========================================
+  # STUDENTS
+  # ==========================================
+  /students/{studentId}:
+    get:
+      tags:
+        - Students
+      summary: Get student profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Student profile retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Student'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /students/{studentId}/competencies:
+    get:
+      tags:
+        - Students
+        - Competencies
+      summary: Get student competency levels
+      description: Returns CBC competency assessment for student
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Competencies retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      studentId:
+                        type: integer
+                      competencies:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Competency'
+
+  # ==========================================
+  # SCHOOLS
+  # ==========================================
+  /schools/{schoolId}:
+    get:
+      tags:
+        - Schools
+      summary: Get school information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: schoolId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: School information retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/School'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Kamau
+        role:
+          type: string
+          enum: [admin, teacher, parent, student, bursar]
+        schoolId:
+          type: integer
+
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12345
+        firstName:
+          type: string
+          example: Mary
+        lastName:
+          type: string
+          example: Wanjiru
+        admissionNumber:
+          type: string
+          example: STU-2024-001
+        gradeLevel:
+          type: string
+          enum: [PP1, PP2, G1, G2, G3, G4, G5, G6, G7, G8, G9, G10, G11, G12]
+          example: G7
+        nemisUpi:
+          type: string
+          example: 12345678901234567
+        schoolId:
+          type: integer
+        feeBalance:
+          type: number
+          example: 15000
+        enrollmentStatus:
+          type: string
+          enum: [active, transferred, graduated, suspended, expelled, dropped_out]
+        isBoarder:
+          type: boolean
+
+    School:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Nairobi Academy
+        code:
+          type: string
+          example: NAC001
+        nemisCode:
+          type: string
+        knecCode:
+          type: string
+        county:
+          type: string
+          example: Nairobi
+        subcounty:
+          type: string
+        ward:
+          type: string
+        schoolType:
+          type: string
+          enum: [public, private]
+        schoolCategory:
+          type: string
+          enum: [day, boarding, day_and_boarding]
+        schoolLevel:
+          type: string
+          enum: [pre_primary, primary, secondary, primary_and_secondary]
+        subscriptionTier:
+          type: string
+          enum: [tier1, tier2, tier3, tier4]
+        subscriptionStatus:
+          type: string
+          enum: [active, trial, suspended, expired, cancelled]
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+          example: 15000
+        paymentMethod:
+          type: string
+          example: mpesa
+        receiptNumber:
+          type: string
+          example: ABC12345XY
+        paymentDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [completed, pending, failed, reversed]
+        term:
+          type: string
+          example: Term 1
+        academicYear:
+          type: string
+          example: 2024/2025
+
+    Competency:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Communication and Collaboration
+        level:
+          type: integer
+          minimum: 1
+          maximum: 4
+          example: 3
+        lastAssessed:
+          type: string
+          format: date
+        assessments:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              level:
+                type: integer
+              notes:
+                type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Invalid request parameters
+              errors:
+                type: array
+                items:
+                  type: object
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Authentication required
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Resource not found
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Rate limit exceeded. Try again in 15 minutes
+              retryAfter:
+                type: integer
+                example: 900

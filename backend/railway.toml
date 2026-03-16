@@ -1,0 +1,43 @@
+# railway.toml
+# Backend API deployment configuration for Railway
+# https://docs.railway.app/reference/config-as-code
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "node dist/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# ─── Environment Variable Reference ──────────────────────────────────────────
+# Set these in the Railway dashboard → Variables tab.
+# NEVER commit real values to git.
+#
+# Required (server will refuse to start without these):
+#   DATABASE_URL         ← Set automatically when you add Railway Postgres
+#   REDIS_URL            ← Set automatically when you add Railway Redis
+#   JWT_SECRET           ← openssl rand -base64 64
+#   JWT_REFRESH_SECRET   ← openssl rand -base64 64
+#   ENCRYPTION_KEY       ← openssl rand -base64 32
+#   API_BASE_URL         ← https://your-app.railway.app
+#   FRONTEND_URL         ← https://your-app.vercel.app
+#
+# M-Pesa (Safaricom Daraja — start with sandbox=false for demo):
+#   MPESA_CONSUMER_KEY
+#   MPESA_CONSUMER_SECRET
+#   MPESA_PASSKEY
+#   MPESA_SHORTCODE
+#   MPESA_ENVIRONMENT    ← "sandbox" for demo, "production" after go-live
+#
+# Africa's Talking SMS (optional — server warns but runs without it):
+#   AT_API_KEY
+#   AT_USERNAME
+#   AT_SENDER_ID         ← CBCSCHOOL
+#
+# Optional monitoring:
+#   SENTRY_DSN
+#   SLACK_WEBHOOK_URL

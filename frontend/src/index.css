@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CBC Brand Design Tokens ─────────────────────────────────────────────── */
+:root {
+  --cbc-navy:   #1B3A6B;
+  --cbc-gold:   #E8C840;
+  --cbc-teal:   #028090;
+  --cbc-green:  #02C39A;
+  --cbc-white:  #FFFFFF;
+
+  /* Offline indicator */
+  --offline-bg:   #FEF3C7;
+  --offline-text: #92400E;
+}
+
+/* ── Base resets ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { margin: 0; -webkit-font-smoothing: antialiased; }
+
+/* ── PWA: Safe area insets (iPhone notch / Android nav bar) ─────────────── */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ── Offline mode banner ─────────────────────────────────────────────────── */
+.offline-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: var(--offline-bg);
+  color: var(--offline-text);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+}
+
+/* ── M-Pesa green pulse animation (payment processing) ──────────────────── */
+@keyframes mpesa-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.mpesa-processing { animation: mpesa-pulse 1.5s ease-in-out infinite; }
+
+/* ── CBC competency badge colours ────────────────────────────────────────── */
+.competency-EE { @apply bg-green-100 text-green-800; }   /* Exceeds Expectation */
+.competency-ME { @apply bg-blue-100 text-blue-800; }     /* Meets Expectation */
+.competency-AE { @apply bg-yellow-100 text-yellow-800; } /* Approaches Expectation */
+.competency-BE { @apply bg-red-100 text-red-800; }       /* Below Expectation */
+
+/* ── Print styles (CBC report cards) ────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+  body { font-size: 12px; }
+}

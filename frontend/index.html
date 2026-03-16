@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-KE" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA meta -->
+    <meta name="theme-color" content="#1B3A6B" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CBC Learning" />
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- SEO / sharing -->
+    <meta name="description" content="CBC Learning Ecosystem — Digital management platform for Kenya's Competency-Based Curriculum schools. M-Pesa fee payments, CBC tracking, offline-first." />
+    <meta property="og:title" content="CBC Learning Ecosystem" />
+    <meta property="og:description" content="M-Pesa fee collection. CBC competency tracking. Works offline." />
+    <meta property="og:type" content="website" />
+
+    <!-- Prevent flash of unstyled content on slower connections -->
+    <style>
+      #root { min-height: 100vh; }
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+    </style>
+
+    <title>CBC Learning Ecosystem</title>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Inline loader shown before React hydrates — keeps lab PCs from showing blank screen -->
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#1B3A6B;">
+        <div style="text-align:center;color:#E8C840;">
+          <div style="font-size:32px;font-weight:bold;letter-spacing:2px;">CBC</div>
+          <div style="font-size:14px;color:#94a3b8;margin-top:8px;">Loading…</div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
