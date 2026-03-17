@@ -8,6 +8,7 @@ declare module 'africastalking' {
     send(options: {
       to: string[];
       message: string;
+      from?: string;
       enqueue?: boolean;
     }): Promise<{
       SMSMessageData: {
