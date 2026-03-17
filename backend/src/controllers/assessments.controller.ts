@@ -10,7 +10,7 @@
 import { Request, Response } from 'express';
 import { Pool } from 'pg';
 import { SmsNotificationService } from '../services/sms-notification.service';
-import { logger } from '../middleware/logger';
+import { logger } from '../utils/logger';
 
 // ── CBC competency level from percentage ──────────────────────────────────────
 

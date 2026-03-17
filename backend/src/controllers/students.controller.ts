@@ -12,7 +12,7 @@
 
 import { Request, Response } from 'express';
 import { Pool } from 'pg';
-import { logger } from '../middleware/logger';
+import { logger } from '../utils/logger';
 
 export class StudentsController {
   constructor(private db: Pool) {}

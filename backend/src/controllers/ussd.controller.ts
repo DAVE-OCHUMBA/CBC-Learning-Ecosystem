@@ -12,7 +12,7 @@
 import { Request, Response } from 'express';
 import { UssdService } from '../services/ussd.service';
 import { SmsNotificationService } from '../services/sms-notification.service';
-import { logger } from '../middleware/logger';
+import { logger } from '../utils/logger';
 
 export class UssdController {
   constructor(
