@@ -14,7 +14,7 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
-    "africastalking": "^0.5.0",
+    "africastalking": "^0.7.9",
     "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",
     "bull": "^4.12.0",
