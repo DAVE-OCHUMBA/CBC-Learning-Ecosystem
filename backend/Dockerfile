@@ -13,7 +13,7 @@ RUN npm install --include=dev --no-optional
 # Copy source and compile TypeScript
 COPY tsconfig.json ./
 COPY src/ ./src/
-RUN npm run build
+RUN npx -y tsc --project tsconfig.json
 
 # Prune dev dependencies for runtime stage
 RUN npm prune --omit=dev
