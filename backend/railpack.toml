@@ -1,0 +1,2 @@
+[build]
+cmd = "npm ci --include=dev && npm run build"
