@@ -6,7 +6,8 @@
  * Always uses SSL in production.
  */
 
-import knex, { Knex } from 'knex';
+import knex from 'knex';
+import type { Knex } from 'knex';
 import { logger } from '../utils/logger';
 
 const isProd = process.env.NODE_ENV === 'production';
