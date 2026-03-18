@@ -6,10 +6,17 @@ WORKDIR /app
 # Install build dependencies for native modules (Alpine compatibility)
 RUN apk add --no-cache python3 make g++ curl
 
-# Install production dependencies only
-# (dist folder is already built by Railway preDeploy step)
+# Install dependencies (including dev for TypeScript compilation)
 COPY package*.json ./
-RUN npm cache clean --force && npm install --legacy-peer-deps --omit=dev
+RUN npm cache clean --force && npm install --legacy-peer-deps
+
+# Copy source and compile TypeScript
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN npm run build
+
+# Prune dev dependencies for runtime stage
+RUN npm prune --omit=dev
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
@@ -19,7 +26,7 @@ RUN addgroup -S cbc && adduser -S cbc -G cbc
 
 WORKDIR /app
 
-# Copy compiled output + production node_modules only
+# Copy compiled output + production node_modules
 COPY --from=builder /app/dist       ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
