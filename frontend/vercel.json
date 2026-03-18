@@ -34,8 +34,5 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ],
-  "env": {
-    "VITE_API_BASE_URL": "@cbc_api_base_url"
-  }
+  ]
 }
