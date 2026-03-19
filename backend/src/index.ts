@@ -123,6 +123,24 @@ app.get('/health', async (_req, res) => {
   }
 });
 
+app.get('/', (_req, res) => {
+  res.json({
+    success: true,
+    message: 'CBC Learning Ecosystem API v1.0.0',
+    endpoints: {
+      health: '/health',
+      ready: '/ready',
+      auth: '/api/v1/auth',
+      payments: '/api/v1/payments',
+      students: '/api/v1/students',
+      assessments: '/api/v1/assessments',
+      attendance: '/api/v1/attendance',
+      ussd: '/api/v1/ussd',
+      sync: '/api/v1/sync',
+    },
+  });
+});
+
 // ── Readiness check (returns 200 only when fully initialized) ──────────────────
 app.get('/ready', (_req, res) => {
   if (!isReady) {

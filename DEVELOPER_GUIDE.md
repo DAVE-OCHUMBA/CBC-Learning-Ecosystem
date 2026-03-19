@@ -27,7 +27,7 @@ cd backend
 cp .env.example .env          # Fill in M-Pesa sandbox keys
 npm install
 npm run build                 # Check TypeScript compilation
-npm run dev                   # Start with hot-reload
+npm run build# Start with hot-reload
 
 # 2. Frontend setup (new terminal)
 cd frontend
