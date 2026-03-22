@@ -45,7 +45,7 @@ services:
       target: builder          # Use build stage for dev tools (ts-node-dev)
     container_name: cbc-backend-dev
     env_file:
-      - ./backend/.env
+      - ./backend/.envdocker 
     restart: unless-stopped
     command: npm run start
     environment:
