@@ -10,7 +10,7 @@
  * - payments is a VIEW on fee_payments — indexed via fee_payments instead
  */
 
-import { Knex } from 'knex';
+import type { Knex } from 'knex';
 
 async function safeIndex(
   knex: Knex,

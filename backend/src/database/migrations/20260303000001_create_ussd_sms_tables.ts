@@ -11,7 +11,7 @@
  * Also adds parent_id FK to students table for USSD parent lookup.
  */
 
-import { Knex } from 'knex';
+import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
 
