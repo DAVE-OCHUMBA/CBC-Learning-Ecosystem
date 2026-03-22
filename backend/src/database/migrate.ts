@@ -6,7 +6,8 @@
  * Usage: node -e "require('./dist/database/migrate').run()"
  */
 
-import knex, { Knex } from 'knex';
+import knex from 'knex';
+import type { Knex } from 'knex';
 import path from 'path';
 
 export async function run(): Promise<void> {

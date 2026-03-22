@@ -12,7 +12,7 @@
  *   auth_audit_log    — immutable auth event log
  */
 
-import { Knex } from 'knex';
+import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
 
