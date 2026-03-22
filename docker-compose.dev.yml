@@ -45,7 +45,7 @@ services:
       target: builder          # Use build stage for dev tools (ts-node-dev)
     container_name: cbc-backend-dev
     restart: unless-stopped
-    command: npm run dev
+    command: npm run start
     environment:
       NODE_ENV: development
       PORT: 5000
@@ -92,7 +92,7 @@ services:
       target: builder
     container_name: cbc-frontend-dev
     restart: unless-stopped
-    command: npm run dev -- --host 0.0.0.0
+    command: npm run start -- --host 0.0.0.0
     environment:
       VITE_API_BASE_URL: http://localhost:5000
     ports:
