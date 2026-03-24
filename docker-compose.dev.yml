@@ -52,6 +52,7 @@ services:
       NODE_ENV: development
       PORT: 5000
  JWT_REFRESH_SECRET: fa26facfd340c344d462df64ac30cb7ed7bf92dc05918c56b20228a944d451db
+ JWT_REFRESH_SECRET: fa26facfd340c344d462df64ac30cb7ed7bf92dc05918c56b20228a944d451db
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: cbc_learning_dev
