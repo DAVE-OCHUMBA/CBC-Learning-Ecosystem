@@ -72,10 +72,10 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await safeIndex(knex, 'offline_sync_queue', (t) => {
-    t.index(['device_id'],           'idx_sync_device_id');
-    t.index(['status'],              'idx_sync_status');
-    t.index(['created_at'],          'idx_sync_created_at');
-    t.index(['device_id', 'status'], 'idx_sync_device_status');
+    t.index(['device_id'],              'idx_sync_device_id');
+    t.index(['sync_status'],            'idx_sync_status');
+    t.index(['created_at'],             'idx_sync_created_at');
+    t.index(['device_id', 'sync_status'], 'idx_sync_device_status');
   });
 
   await safeIndex(knex, 'schools', (t) => {
