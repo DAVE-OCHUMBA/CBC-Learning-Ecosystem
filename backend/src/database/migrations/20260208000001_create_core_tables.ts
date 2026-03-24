@@ -5,7 +5,7 @@
  * Creates all tables referenced by FK constraints in later migrations.
  * Timestamp 20260208 ensures this runs FIRST.
  *
- * Tables: users, teachers, parents, classes, competencies,
+ * Tables: teachers, parents, classes, competencies,
  *         notifications, audit_log
  *
  * NOTE: assessments and fee_payments are created in
@@ -19,44 +19,6 @@ export async function up(knex: Knex): Promise<void> {
   // Enable extensions used by performance indexes migration
   await knex.raw('CREATE EXTENSION IF NOT EXISTS pg_trgm');
   await knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
-
-  // ─── USERS ────────────────────────────────────────────────────────────────
-  await knex.schema.createTable('users', (table) => {
-    table.increments('id').primary();
-    table.integer('school_id').nullable();
-    table.string('email', 255).unique().notNullable();
-    table.string('password_hash', 255).notNullable();
-    table.string('first_name', 100).notNullable();
-    table.string('last_name', 100).notNullable();
-    table.string('phone', 20).nullable();
-    table.enum('role', ['super_admin','school_admin','teacher','parent','student'])
-      .notNullable().defaultTo('parent');
-
-    // Auth / session
-    table.string('refresh_token_hash', 255).nullable();
-    table.timestamp('refresh_token_expires_at').nullable();
-    table.timestamp('last_login_at').nullable();
-    table.integer('failed_login_attempts').defaultTo(0);
-    table.timestamp('locked_until').nullable();
-
-    // ODPC compliance (Kenya Data Protection Act)
-    table.boolean('consent_given').defaultTo(false);
-    table.timestamp('consent_given_at').nullable();
-    table.boolean('data_processing_agreed').defaultTo(false);
-
-    table.boolean('is_active').defaultTo(true);
-    table.boolean('email_verified').defaultTo(false);
-    table.string('email_verification_token', 255).nullable();
-    table.string('password_reset_token', 255).nullable();
-    table.timestamp('password_reset_expires_at').nullable();
-
-    table.timestamp('created_at').defaultTo(knex.fn.now());
-    table.timestamp('updated_at').defaultTo(knex.fn.now());
-
-    table.index('email');
-    table.index('school_id');
-    table.index('role');
-  });
 
   // ─── TEACHERS ─────────────────────────────────────────────────────────────
   await knex.schema.createTable('teachers', (table) => {
@@ -210,7 +172,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   for (const t of ['audit_log','notifications',
-    'competencies','classes','parents','teachers','users']) {
+    'competencies','classes','parents','teachers']) {
     await knex.schema.dropTableIfExists(t);
   }
 }
