@@ -28,21 +28,21 @@ export async function seed(knex: Knex): Promise<void> {
       id: 901, code: 'DEMO-NAK-001', name: 'Nakuru Secondary School',
       type: 'public', category: 'day', level: 'secondary', cluster: 'C2',
       county: 'Nakuru', sub_county: 'Nakuru East',
-      subscription_status: 'active', student_count: 520,
+      subscription_status: 'active', subscription_tier: 'tier1', student_count: 520,
       settings: JSON.stringify({ demo: true }),
     },
     {
       id: 902, code: 'DEMO-ELD-001', name: 'Eldoret Boarding School',
       type: 'public', category: 'boarding', level: 'secondary', cluster: 'C3',
       county: 'Uasin Gishu', sub_county: 'Eldoret East',
-      subscription_status: 'active', student_count: 380,
+      subscription_status: 'active', subscription_tier: 'tier2', student_count: 380,
       settings: JSON.stringify({ demo: true }),
     },
     {
       id: 903, code: 'DEMO-MSA-001', name: 'Mombasa International Academy',
       type: 'private', category: 'day', level: 'both', cluster: 'C1',
       county: 'Mombasa', sub_county: 'Mvita',
-      subscription_status: 'active', student_count: 680,
+      subscription_status: 'active', subscription_tier: 'tier3', student_count: 680,
       settings: JSON.stringify({ demo: true }),
     },
   ]);
@@ -51,22 +51,22 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('users').insert([
     { id: 9001, school_id: 901, email: 'admin@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Sarah', last_name: 'Kamau',
-      role: 'school_admin', phone: '+254700000001', is_active: true, consent_given: true },
+      role: 'admin', phone: '+254700000001', status: 'active', email_verified: true, phone_verified: true },
     { id: 9002, school_id: 901, email: 'teacher@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'James', last_name: 'Ochieng',
-      role: 'teacher', phone: '+254700000002', is_active: true, consent_given: true },
+      role: 'teacher', phone: '+254700000002', status: 'active', email_verified: true, phone_verified: true },
     { id: 9003, school_id: 902, email: 'teacher2@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Faith', last_name: 'Wanjiru',
-      role: 'teacher', phone: '+254700000003', is_active: true, consent_given: true },
+      role: 'teacher', phone: '+254700000003', status: 'active', email_verified: true, phone_verified: true },
     { id: 9004, school_id: 901, email: 'parent@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'David', last_name: 'Mwangi',
-      role: 'parent', phone: '+254708374149', is_active: true, consent_given: true },
+      role: 'parent', phone: '+254708374149', status: 'active', email_verified: true, phone_verified: true },
     { id: 9005, school_id: 902, email: 'parent2@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Grace', last_name: 'Akinyi',
-      role: 'parent', phone: '+254700000005', is_active: true, consent_given: true },
+      role: 'parent', phone: '+254700000005', status: 'active', email_verified: true, phone_verified: true },
     { id: 9006, school_id: 901, email: 'student@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Brian', last_name: 'Mwangi',
-      role: 'student', phone: '+254700000006', is_active: true, consent_given: true },
+      role: 'parent', phone: '+254700000006', status: 'active', email_verified: true, phone_verified: true },
   ]);
 
   // ─── Teacher profiles ──────────────────────────────────────────────────────
@@ -118,22 +118,26 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('students').insert(students);
 
   // ─── M-Pesa transactions ───────────────────────────────────────────────────
-  const statuses = ['completed','completed','completed','pending','failed'];
+  const statuses = ['successful','successful','successful','pending','failed'];
   const amounts  = [2500, 5000, 7500, 3200, 4800];
   const txns = Array.from({ length: 15 }, (_, i) => {
     const daysAgo = Math.floor(Math.random() * 30);
     const status  = statuses[i % 5];
     return {
-      id: `DEMO-TXN-${String(i + 1).padStart(4, '0')}`,
       school_id: i < 10 ? 901 : 902,
       student_id: 90100 + (i % 20),
       phone_number: '+254708374149',
       amount: amounts[i % 5],
       status,
       account_reference: `DEMO-${String(i + 1).padStart(6, '0')}`,
-      merchant_request_id: `MR-DEMO-${i}`,
-      checkout_request_id: `CR-DEMO-${i}`,
-      receipt_number: status === 'completed' ? `RCP${String(i).padStart(8, '0')}` : null,
+      merchant_request_id: `MR-DEMO-${String(i).padStart(4, '0')}`,
+      checkout_request_id: `CR-DEMO-${String(i).padStart(4, '0')}`,
+      mpesa_receipt_number: status === 'successful' ? `RCP${String(i).padStart(8, '0')}` : null,
+      transaction_desc: `Demo fee payment for student`,
+      result_code: status === 'successful' ? 0 : (status === 'pending' ? null : 1),
+      result_desc: status === 'successful' ? 'The service request has been accepted for processing' : (status === 'pending' ? 'Processing' : 'Transaction failed'),
+      callback_received: status !== 'pending',
+      reconciled: status === 'successful',
       created_at: new Date(Date.now() - daysAgo * 86400000),
       updated_at: new Date(Date.now() - daysAgo * 86400000 + 30000),
     };
