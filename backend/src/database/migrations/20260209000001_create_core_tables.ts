@@ -3,7 +3,8 @@
  * CBC Learning Ecosystem
  *
  * Creates all tables referenced by FK constraints in later migrations.
- * Timestamp 20260208 ensures this runs FIRST.
+ * Timestamp 20260209000001 ensures this runs AFTER the users table
+ * (20260209000000_create_users_table.ts).
  *
  * Tables: teachers, parents, classes, competencies,
  *         notifications, audit_log
