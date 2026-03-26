@@ -26,7 +26,7 @@ export async function up(knex: Knex): Promise<void> {
     table.increments('id').primary();
     table.integer('user_id').notNullable()
       .references('id').inTable('users').onDelete('CASCADE');
-    table.integer('school_id').notNullable()
+    table.uuid('school_id').notNullabl
       .references('id').inTable('schools').onDelete('CASCADE');
 
     table.string('tsc_number', 50).nullable();
