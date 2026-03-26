@@ -51,22 +51,22 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('users').insert([
     { id: 9001, school_id: 901, email: 'admin@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Sarah', last_name: 'Kamau',
-      role: 'school_admin', phone: '+254700000001', is_active: true, consent_given: true },
+      role: 'school_admin', phone: '+254700000001', status: 'active' },
     { id: 9002, school_id: 901, email: 'teacher@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'James', last_name: 'Ochieng',
-      role: 'teacher', phone: '+254700000002', is_active: true, consent_given: true },
+      role: 'teacher', phone: '+254700000002', status: 'active' },
     { id: 9003, school_id: 902, email: 'teacher2@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Faith', last_name: 'Wanjiru',
-      role: 'teacher', phone: '+254700000003', is_active: true, consent_given: true },
+      role: 'teacher', phone: '+254700000003', status: 'active' },
     { id: 9004, school_id: 901, email: 'parent@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'David', last_name: 'Mwangi',
-      role: 'parent', phone: '+254708374149', is_active: true, consent_given: true },
+      role: 'parent', phone: '+254708374149', status: 'active' },
     { id: 9005, school_id: 902, email: 'parent2@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Grace', last_name: 'Akinyi',
-      role: 'parent', phone: '+254700000005', is_active: true, consent_given: true },
+      role: 'parent', phone: '+254700000005', status: 'active' },
     { id: 9006, school_id: 901, email: 'student@demo.cbclearning.co.ke',
       password_hash: DEMO_PASSWORD_HASH, first_name: 'Brian', last_name: 'Mwangi',
-      role: 'student', phone: '+254700000006', is_active: true, consent_given: true },
+      role: 'student', phone: '+254700000006', status: 'active' },
   ]);
 
   // ─── Teacher profiles ──────────────────────────────────────────────────────
