@@ -29,6 +29,7 @@ export async function run(): Promise<void> {
     console.log('[migration] Running pending migrations…');
     const [batch, migrations] = await db.migrate.latest({
       directory: path.join(__dirname, 'migrations'),
+      extension: 'js', // Look for compiled .js files, not .ts
     });
 
     if (migrations.length === 0) {
